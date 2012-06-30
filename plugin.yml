@@ -1,0 +1,17 @@
+name: MushPoof
+main: se.enji.MushPoof
+author: enjikaka
+website: http://enji.se
+version: 3.7
+
+commands:
+  mush:
+    description: Give mushroom.
+    usage: Simply type /<command> (amount) to get some mushroom blocks.
+    permission: mushpoof.mush
+    permission-message: You are not allowed to do /mush
+
+permissions:
+  mushpoof.mush:
+    description: Gives you access to the /mush command.
+    default: op
