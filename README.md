@@ -1,4 +1,0 @@
-MushPoof
-========
-
-Plugin for Craftbukkit
