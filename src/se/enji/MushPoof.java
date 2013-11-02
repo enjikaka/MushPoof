@@ -1,4 +1,4 @@
-package org.vufuzi;
+package se.enji;
 
 import java.util.Random;
 import java.util.logging.Logger;
