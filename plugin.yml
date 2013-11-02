@@ -2,7 +2,7 @@ name: MushPoof
 main: org.vufuzi.MushPoof
 author: enjikaka
 website: http://vufuzi.org
-version: 4.0
+version: 4.1
 
 commands:
   mush:

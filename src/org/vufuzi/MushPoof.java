@@ -26,6 +26,7 @@ public class MushPoof extends JavaPlugin implements Listener {
 	Random random=new Random();
 	double stilla=-0.0784000015258789;
 	double hoppa=-0.7170746714356033;
+	boolean canJump=true;
 
 	public void onEnable() {
 		getServer().getPluginManager().registerEvents(this, this);
@@ -97,9 +98,12 @@ public class MushPoof extends JavaPlugin implements Listener {
   		if (ty-fy==1&&isMush(o)) {
 			int gy=y+4;
   			while (oo!=Material.AIR) gy++;
+  			canJump = false;
   			loc.setY(gy);
   			p.teleport(loc);
   			loc.setX(x);
+  			p.setVelocity(new Vector(0,0,0));
+  			canJump = true;
   		}
   		Material k = w.getBlockAt(x,y-3,z).getType();
   		if (isMush(b)&&k==Material.AIR&&p.isSneaking()) {
