@@ -4,6 +4,7 @@ import java.util.Random;
 import java.util.logging.Logger;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -42,7 +43,7 @@ public class MushPoof extends JavaPlugin implements Listener {
 					if (isInt(args[0])) amount=Integer.parseInt(args[0]);
 					else return false;
 				}
-				p.getInventory().addItem(new ItemStack(100, amount));
+				p.getInventory().addItem(new ItemStack(Material.HUGE_MUSHROOM_2, amount));
 				return true;
 			}
 		}
@@ -65,8 +66,8 @@ public class MushPoof extends JavaPlugin implements Listener {
   		int x=(int)loc.getBlockX();
   		int y=(int)loc.getBlockY();
   		int z=(int)loc.getBlockZ();
-  		int b=w.getBlockTypeIdAt(x,y-1,z);
-  		int c=w.getBlockTypeIdAt(x,y-2,z);
+  		Material b=w.getBlockAt(x, y-1, z).getType();
+  		Material c=w.getBlockAt(x,y-2,z).getType();
   		if (isMushy(b,c)) p.setFallDistance(0);
   		Location p1=e.getFrom();
   		Location p2=e.getTo();
@@ -91,17 +92,17 @@ public class MushPoof extends JavaPlugin implements Listener {
   			p.setVelocity(new Vector(xb,getNode("heightPoof")*1.0D,zb));
   			loc.setX(x);
   		}
-  		int o=w.getBlockTypeIdAt(x,y+3,z);
-  		int oo=w.getBlockTypeIdAt(x,y+4,z);
+  		Material o=w.getBlockAt(x,y+3,z).getType();
+  		Material oo=w.getBlockAt(x,y+4,z).getType();
   		if (ty-fy==1&&isMush(o)) {
 			int gy=y+4;
-  			while (oo!=0) gy++;
+  			while (oo!=Material.AIR) gy++;
   			loc.setY(gy);
   			p.teleport(loc);
   			loc.setX(x);
   		}
-  		int k = w.getBlockTypeIdAt(x,y-3,z);
-  		if (isMush(b)&&k==0&&p.isSneaking()) {
+  		Material k = w.getBlockAt(x,y-3,z).getType();
+  		if (isMush(b)&&k==Material.AIR&&p.isSneaking()) {
   			loc.setY(y-3);
   			p.teleport(loc);
   			loc.setX(x);
@@ -112,13 +113,13 @@ public class MushPoof extends JavaPlugin implements Listener {
 		return config.getDouble(m);
 	}
 	
-	private boolean isMushy(int b, int c) {
+	private boolean isMushy(Material b, Material c) {
 		if ((isMush(b)&&isMush(c))||(isMush(b)||isMush(c))) return true;
 		return false;
 	}
 	
-	private boolean isMush(int i) {
-		if (i==99||i==100) return true;
+	private boolean isMush(Material i) {
+		if (i == Material.HUGE_MUSHROOM_1||i==Material.HUGE_MUSHROOM_2) return true;
 		return false;
 	}
 	
@@ -130,7 +131,7 @@ public class MushPoof extends JavaPlugin implements Listener {
 		ItemStack b = p.getInventory().getBoots();
 		if (b==null) return false;
 		else {
-			if (b.getTypeId()==317) return true;
+			if (b.getType() == Material.GOLD_BOOTS) return true;
 			return false;
 		}
 	}
