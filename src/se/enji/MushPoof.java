@@ -24,8 +24,7 @@ public class MushPoof extends JavaPlugin implements Listener {
 	FileConfiguration config;
 	Logger log=Logger.getLogger("Minecraft");
 	Random random=new Random();
-	double stilla=-0.0784000015258789;
-	double hoppa=-0.7170746714356033;
+	final double STILL=-0.0784000015258789;
 	boolean canJump=true;
 
 	public void onEnable() {
@@ -55,7 +54,7 @@ public class MushPoof extends JavaPlugin implements Listener {
 	public void onEntityDamage(EntityDamageEvent e) {
 		if (e.getEntityType()!=EntityType.PLAYER) return;
 		Player p=(Player)e.getEntity();
-		if (e.getCause()==DamageCause.FALL) if (config.getBoolean("goldenBoots")) if (goldenBoots(p)) e.setCancelled(true);
+		if (e.getCause()==DamageCause.FALL && goldenBoots(p)) e.setCancelled(true);
 	}
 	
 	@EventHandler
@@ -67,7 +66,7 @@ public class MushPoof extends JavaPlugin implements Listener {
   		int x=(int)loc.getBlockX();
   		int y=(int)loc.getBlockY();
   		int z=(int)loc.getBlockZ();
-  		Material b=w.getBlockAt(x, y-1, z).getType();
+  		Material b=w.getBlockAt(x,y-1,z).getType();
   		Material c=w.getBlockAt(x,y-2,z).getType();
   		if (isMushy(b,c)) p.setFallDistance(0);
   		Location p1=e.getFrom();
@@ -78,18 +77,19 @@ public class MushPoof extends JavaPlugin implements Listener {
   		double zb=0;
   		double pp=getNode("sidePoof")*1.0D;
   		double pn=getNode("sidePoof")*-1.0D;
-  		String var=getDirection(p);
-  		if (var=="N") xb = pp;
-  		if (var=="S") xb = pn;
-  		if (var=="E") zb = pp;
-  		if (var=="W") zb = pn;
-  		if (var=="NE"){xb=pp;zb=pp;}
-  		if (var=="NW"){xb=pp;zb=pn;}
-  		if (var=="SE"){xb=pn;zb=pp;}
-  		if (var=="SW"){xb=pn;zb=pn;}
+  		switch (getDirection(p)) {
+  			case 360:xb=pp;break;
+  			case 180:xb=pn;break;
+  			case 270:zb=pp;break;
+  			case 90:zb=pn;break;
+  			case 315:xb=pp;zb=pp;break;
+  			case 45:xb=pp;zb=pn;break;
+  			case 225:xb=pn;zb=pp;break;
+  			case 135:xb=pn;zb=pn;break;
+  		}
   		Vector v=p.getVelocity();
   		double uppfart=v.getY();
-  		if ((ty-fy==1)&&isMushy(b,c)&&(uppfart==stilla)) {
+  		if ((ty-fy==1)&&isMushy(b,c)&&(uppfart>STILL)) {
   			p.setVelocity(new Vector(xb,getNode("heightPoof")*1.0D,zb));
   			loc.setX(x);
   		}
@@ -97,7 +97,7 @@ public class MushPoof extends JavaPlugin implements Listener {
   		Material oo=w.getBlockAt(x,y+4,z).getType();
   		if (ty-fy==1&&isMush(o)) {
 			int gy=y+4;
-  			while (oo!=Material.AIR) gy++;
+  			while (!oo.equals(Material.AIR)) gy++;
   			canJump = false;
   			loc.setY(gy);
   			p.teleport(loc);
@@ -106,7 +106,7 @@ public class MushPoof extends JavaPlugin implements Listener {
   			canJump = true;
   		}
   		Material k = w.getBlockAt(x,y-3,z).getType();
-  		if (isMush(b)&&k==Material.AIR&&p.isSneaking()) {
+  		if (isMush(b)&&k.equals(Material.AIR)&&p.isSneaking()) {
   			loc.setY(y-3);
   			p.teleport(loc);
   			loc.setX(x);
@@ -122,8 +122,8 @@ public class MushPoof extends JavaPlugin implements Listener {
 		return false;
 	}
 	
-	private boolean isMush(Material i) {
-		if (i == Material.HUGE_MUSHROOM_1||i==Material.HUGE_MUSHROOM_2) return true;
+	private boolean isMush(Material m) {
+		if (m.equals(Material.HUGE_MUSHROOM_1)||m.equals(Material.HUGE_MUSHROOM_2)) return true;
 		return false;
 	}
 	
@@ -135,21 +135,21 @@ public class MushPoof extends JavaPlugin implements Listener {
 		ItemStack b = p.getInventory().getBoots();
 		if (b==null) return false;
 		else {
-			if (b.getType() == Material.GOLD_BOOTS) return true;
+			if (b.getType().equals(Material.GOLD_BOOTS)) return true;
 			return false;
 		}
 	}
 	
-	private String getDirection(Player p) {
+	private int getDirection(Player p) {
 		float y=p.getLocation().getYaw();
-		if (((y>=22.5D)&&(y<67.5D))||((y<=-292.5D)&&(y>-337.5D))) return "SE";
-	    if (((y>=67.5D)&&(y<112.5D))||((y<=-247.5D)&&(y>-292.5D))) return "S";
-	    if (((y>=112.5D)&&(y<157.5D))||((y<=-202.5D)&&(y>-247.5D))) return "SW";
-	    if (((y>=157.5D)&&(y<202.5D))||((y<=-157.5D)&&(y>-202.5D))) return "W";
-	    if (((y>=202.5D)&&(y<247.5D))||((y<=-112.5D)&&(y>-157.5D))) return "NW";
-	    if (((y>=247.5D)&&(y<292.5D))||((y<=-67.5D)&&(y>-112.5D))) return "N";
-	    if (((y>=292.5D)&&(y<337.5D))||((y<=-22.5D)&&(y>-67.5D))) return "NE";
-	    if ((y>=337.5D)||(y<22.5D)||(y<=-337.5D)||(y>-22.5D)) return "E";
-	    return null;
+		if (y>=22.5D&&y<67.5D||y<=-292.5D&&y>-337.5D) return 225;
+	    if (y>=67.5D&&y<112.5D||y<=-247.5D&&y>-292.5D) return 180;
+	    if (y>=112.5D&&y<157.5D||y<=-202.5D&&y>-247.5D) return 135;
+	    if (y>=157.5D&&y<202.5D||y<=-157.5D&&y>-202.5D) return 90;
+	    if (y>=202.5D&&y<247.5D||y<=-112.5D&&y>-157.5D) return 45;
+	    if (y>=247.5D&&y<292.5D||y<=-67.5D&&y>-112.5D) return 360;
+	    if (y>=292.5D&&y<337.5D||y<=-22.5D&&y>-67.5D) return 315;
+	    if (y>=337.5D||y<22.5D||y<=-337.5D||y>-22.5D) return 270;
+	    return 0;
 	}
 }
