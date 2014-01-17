@@ -41,6 +41,7 @@ public class MushPoof extends JavaPlugin implements Listener {
 	public void onEntityDamage(EntityDamageEvent e) {
 		if (!e.getEntityType().equals(EntityType.PLAYER)) return;
 		Player p = (Player) e.getEntity();
+		if (config.getBoolean("goldenBoots") && !goldenBoots(p)) return;
 		if (e.getCause().equals(DamageCause.FALL) && goldenBoots(p)) e.setCancelled(true);
 	}
 	
@@ -55,15 +56,16 @@ public class MushPoof extends JavaPlugin implements Listener {
   		if (isMush(b)) {
   			p.setFallDistance(0);
   			Vector dir = p.getLocation().getDirection();
-  	  		double sp = getNode("sidePoof");
-  	  		double hp = getNode("heightPoof") * 1.0D;
+  	  		double sp = config.getDouble("sidePoof"), hp = config.getDouble("heightPoof") * 1.0D;
   	  	    if (p.isSprinting() && config.getBoolean("fasterWhenSprinting")) {
   	  	    	sp *= 1.5;
   	  	    	hp *= 1.2;
   	  	    }
   	  	    dir = dir.multiply(sp);
   	  	    dir.setY(hp);
-  	  		if (p.getVelocity().getY() > STILL) p.setVelocity(dir);
+  	  		if (p.getVelocity().getY() > STILL) {
+  	  			p.setVelocity(dir);
+  	  		}
   	  		if (w.getBlockAt(x, y - 3, z).getType().equals(Material.AIR) && p.isSneaking()) {
 				loc.setY(y - 3);
 				p.teleport(loc);
@@ -77,11 +79,7 @@ public class MushPoof extends JavaPlugin implements Listener {
   	  			p.setVelocity(new Vector(0, 0, 0));
   	  			canJump = true;
   	  		}
-  		}
-	}
-	
-	private double getNode(String m) {
-		return config.getDouble(m);
+  		} else return;
 	}
 	
 	private boolean isMush(Material m) {
@@ -90,11 +88,11 @@ public class MushPoof extends JavaPlugin implements Listener {
 	}
 	
 	private boolean isInt(String s) {
-		try { 
+		try {
 			Integer.parseInt(s); 
-	    } catch(NumberFormatException e) { 
-	    	return false; 
-	    }
+		} catch (NumberFormatException e) {
+			return false; 
+		}
 	    return true;
 	}
 	
