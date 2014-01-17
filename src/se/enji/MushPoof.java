@@ -33,7 +33,7 @@ public class MushPoof extends JavaPlugin implements Listener {
 	}
 	
 	public boolean onCommand(CommandSender sender, Command cmd, String command, String[] args) {
-		if (sender instanceof Player) return false;
+		if (!(sender instanceof Player)) return false;
 		Player p = (Player) sender;
 		int amount = args.length == 1 && isInt(args[0]) ? Integer.parseInt(args[0]) : 64;
 		p.getInventory().addItem(new ItemStack(Material.HUGE_MUSHROOM_2, amount));
