@@ -1,7 +1,6 @@
 package se.enji;
 
 import java.util.Random;
-import java.util.logging.Logger;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -22,27 +21,22 @@ import org.bukkit.util.Vector;
 
 public class MushPoof extends JavaPlugin implements Listener {
 	FileConfiguration config;
-	Logger log=Logger.getLogger("Minecraft");
-	Random random=new Random();
-	final double STILL=-0.0784000015258789;
-	boolean canJump=true;
+	Random random = new Random();
+	final double STILL = -0.0784000015258789;
+	boolean canJump = true;
 
 	public void onEnable() {
 		getServer().getPluginManager().registerEvents(this, this);
-		config=getConfig();
+		config = getConfig();
 		config.options().copyDefaults(true);
 		saveConfig();
 	}
 	
 	public boolean onCommand(CommandSender sender, Command cmd, String command, String[] args) {
 		if (sender instanceof Player) {
-			Player p=(Player)sender;
+			Player p = (Player) sender;
 			if (command.equalsIgnoreCase("mush")) {
-				int amount=1;
-				if (args.length==1) {
-					if (isInt(args[0])) amount=Integer.parseInt(args[0]);
-					else return false;
-				}
+				int amount = args.length == 1 && isInt(args[0]) ? Integer.parseInt(args[0]) : 64;
 				p.getInventory().addItem(new ItemStack(Material.HUGE_MUSHROOM_2, amount));
 				return true;
 			}
@@ -52,55 +46,53 @@ public class MushPoof extends JavaPlugin implements Listener {
 	
 	@EventHandler
 	public void onEntityDamage(EntityDamageEvent e) {
-		if (e.getEntityType()!=EntityType.PLAYER) return;
-		Player p=(Player)e.getEntity();
-		if (e.getCause()==DamageCause.FALL && goldenBoots(p)) e.setCancelled(true);
+		if (!e.getEntityType().equals(EntityType.PLAYER)) return;
+		Player p = (Player) e.getEntity();
+		if (e.getCause() == DamageCause.FALL && goldenBoots(p)) e.setCancelled(true);
 	}
 	
 	@EventHandler
 	public void onPlayerMove(PlayerMoveEvent e) {
-  		Player p=e.getPlayer();
-  		if (config.getBoolean("goldenBoots")) if (!goldenBoots(p)) return;
-  		World w=p.getWorld();
-  		Location loc=p.getLocation();
-  		int x=(int)loc.getBlockX();
-  		int y=(int)loc.getBlockY();
-  		int z=(int)loc.getBlockZ();
-  		Material b=w.getBlockAt(x,y-1,z).getType();
-  		Material c=w.getBlockAt(x,y-2,z).getType();
+  		Player p = e.getPlayer();
+  		if (config.getBoolean("goldenBoots") && !goldenBoots(p)) return;
+  		World w = p.getWorld();
+  		Location loc = p.getLocation();
+  		int x = (int) loc.getBlockX(), y = (int) loc.getBlockY(), z = (int) loc.getBlockZ();
+  		Material b = w.getBlockAt(x, y - 1, z).getType();
+  		Material c = w.getBlockAt(x, y - 2,z).getType();
   		if (isMushy(b,c)) p.setFallDistance(0);
   		else return;
-  		Location p1=e.getFrom(),p2=e.getTo();
-  		int fy=(int)Math.round(p1.getY());
-  		int ty=(int)Math.round(p2.getY());
+  		Location p1 = e.getFrom(), p2 = e.getTo();
+  		int fy = (int) Math.round(p1.getY());
+  		int ty = (int) Math.round(p2.getY());
   		Vector dir = p.getLocation().getDirection();
   		double sp = getNode("sidePoof");
-  		double hp = getNode("heightPoof")*1.0D;
+  		double hp = getNode("heightPoof") * 1.0D;
   	    if (p.isSprinting() && config.getBoolean("fasterWhenSprinting")) {
-  	    	sp*=1.5;
-  	    	hp*=1.2;
+  	    	sp *= 1.5;
+  	    	hp *= 1.2;
   	    }
-  	    dir=dir.multiply(sp);
+  	    dir = dir.multiply(sp);
   	    dir.setY(hp);
-  		if (p.getVelocity().getY()>STILL) {
+  		if (p.getVelocity().getY() > STILL) {
   			p.setVelocity(dir);
   			loc.setX(x);
   		}
-  		Material o=w.getBlockAt(x,y+3,z).getType();
-  		Material oo=w.getBlockAt(x,y+4,z).getType();
-  		if (ty-fy==1&&isMush(o)) {
-			int gy=y+4;
+  		Material o = w.getBlockAt(x, y + 3,z).getType();
+  		Material oo = w.getBlockAt(x, y + 4, z).getType();
+  		if (ty - fy == 1 && isMush(o)) {
+			int gy = y + 4;
   			while (!oo.equals(Material.AIR)) gy++;
   			canJump = false;
   			loc.setY(gy);
   			p.teleport(loc);
   			loc.setX(x);
-  			p.setVelocity(new Vector(0,0,0));
+  			p.setVelocity(new Vector(0, 0, 0));
   			canJump = true;
   		}
-  		Material k = w.getBlockAt(x,y-3,z).getType();
-  		if (isMush(b)&&k.equals(Material.AIR)&&p.isSneaking()) {
-  			loc.setY(y-3);
+  		Material k = w.getBlockAt(x, y - 3, z).getType();
+  		if (isMush(b) && k.equals(Material.AIR) && p.isSneaking()) {
+  			loc.setY(y - 3);
   			p.teleport(loc);
   			loc.setX(x);
   		}
@@ -111,25 +103,28 @@ public class MushPoof extends JavaPlugin implements Listener {
 	}
 	
 	private boolean isMushy(Material b, Material c) {
-		if ((isMush(b)&&isMush(c))||(isMush(b)||isMush(c))) return true;
+		if ((isMush(b) && isMush(c)) || (isMush(b) || isMush(c))) return true;
 		return false;
 	}
 	
 	private boolean isMush(Material m) {
-		if (m.equals(Material.HUGE_MUSHROOM_1)||m.equals(Material.HUGE_MUSHROOM_2)) return true;
+		if (m.equals(Material.HUGE_MUSHROOM_1) || m.equals(Material.HUGE_MUSHROOM_2)) return true;
 		return false;
 	}
 	
 	private boolean isInt(String s) {
-		return s.matches("((-|\\+)?[0-9]+(\\.[0-9]+)?)+");
+		try { 
+			Integer.parseInt(s); 
+	    } catch(NumberFormatException e) { 
+	    	return false; 
+	    }
+	    return true;
 	}
 	
 	private boolean goldenBoots(Player p) {
 		ItemStack b = p.getInventory().getBoots();
-		if (b==null) return false;
-		else {
-			if (b.getType().equals(Material.GOLD_BOOTS)) return true;
-			return false;
-		}
+		if (b == null) return false;
+		else if (b.getType().equals(Material.GOLD_BOOTS)) return true;
+		return false;
 	}
 }
