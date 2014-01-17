@@ -50,54 +50,38 @@ public class MushPoof extends JavaPlugin implements Listener {
   		if (config.getBoolean("goldenBoots") && !goldenBoots(p)) return;
   		World w = p.getWorld();
   		Location loc = p.getLocation();
-  		int x = (int) loc.getBlockX(), y = (int) loc.getBlockY(), z = (int) loc.getBlockZ();
-  		Material b = w.getBlockAt(x, y - 1, z).getType();
-  		Material c = w.getBlockAt(x, y - 2,z).getType();
-  		if (isMushy(b,c)) p.setFallDistance(0);
-  		else return;
-  		Location p1 = e.getFrom(), p2 = e.getTo();
-  		int fy = (int) Math.round(p1.getY());
-  		int ty = (int) Math.round(p2.getY());
-  		Vector dir = p.getLocation().getDirection();
-  		double sp = getNode("sidePoof");
-  		double hp = getNode("heightPoof") * 1.0D;
-  	    if (p.isSprinting() && config.getBoolean("fasterWhenSprinting")) {
-  	    	sp *= 1.5;
-  	    	hp *= 1.2;
-  	    }
-  	    dir = dir.multiply(sp);
-  	    dir.setY(hp);
-  		if (p.getVelocity().getY() > STILL) {
-  			p.setVelocity(dir);
-  			loc.setX(x);
-  		}
-  		Material o = w.getBlockAt(x, y + 3,z).getType();
-  		Material oo = w.getBlockAt(x, y + 4, z).getType();
-  		if (ty - fy == 1 && isMush(o)) {
-			int gy = y + 4;
-  			while (!oo.equals(Material.AIR)) gy++;
-  			canJump = false;
-  			loc.setY(gy);
-  			p.teleport(loc);
-  			loc.setX(x);
-  			p.setVelocity(new Vector(0, 0, 0));
-  			canJump = true;
-  		}
-  		Material k = w.getBlockAt(x, y - 3, z).getType();
-  		if (isMush(b) && k.equals(Material.AIR) && p.isSneaking()) {
-  			loc.setY(y - 3);
-  			p.teleport(loc);
-  			loc.setX(x);
+  		int x = loc.getBlockX(), y = loc.getBlockY(), z = loc.getBlockZ();
+  		Material b = w.getBlockAt(x, y - 1, z).getType(), o = w.getBlockAt(x, y + 3,z).getType();
+  		if (isMush(b)) {
+  			p.setFallDistance(0);
+  			Vector dir = p.getLocation().getDirection();
+  	  		double sp = getNode("sidePoof");
+  	  		double hp = getNode("heightPoof") * 1.0D;
+  	  	    if (p.isSprinting() && config.getBoolean("fasterWhenSprinting")) {
+  	  	    	sp *= 1.5;
+  	  	    	hp *= 1.2;
+  	  	    }
+  	  	    dir = dir.multiply(sp);
+  	  	    dir.setY(hp);
+  	  		if (p.getVelocity().getY() > STILL) p.setVelocity(dir);
+  	  		if (w.getBlockAt(x, y - 3, z).getType().equals(Material.AIR) && p.isSneaking()) {
+				loc.setY(y - 3);
+				p.teleport(loc);
+			}
+  		} else if (isMush(o)) {
+  			Material oo = w.getBlockAt(x, y + 4, z).getType();
+  	  		if (p.getVelocity().getY() > STILL && oo.equals(Material.AIR)) {
+  	  			canJump = false;
+  	  			loc.setY(y + 4);
+  	  			p.teleport(loc);
+  	  			p.setVelocity(new Vector(0, 0, 0));
+  	  			canJump = true;
+  	  		}
   		}
 	}
 	
 	private double getNode(String m) {
 		return config.getDouble(m);
-	}
-	
-	private boolean isMushy(Material b, Material c) {
-		if ((isMush(b) && isMush(c)) || (isMush(b) || isMush(c))) return true;
-		return false;
 	}
 	
 	private boolean isMush(Material m) {
@@ -115,9 +99,6 @@ public class MushPoof extends JavaPlugin implements Listener {
 	}
 	
 	private boolean goldenBoots(Player p) {
-		ItemStack b = p.getInventory().getBoots();
-		if (b == null) return false;
-		else if (b.getType().equals(Material.GOLD_BOOTS)) return true;
-		return false;
+		return (p.getInventory().getBoots() == null) ? false : p.getInventory().getBoots().getType().equals(Material.GOLD_BOOTS);
 	}
 }
