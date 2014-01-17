@@ -69,28 +69,21 @@ public class MushPoof extends JavaPlugin implements Listener {
   		Material b=w.getBlockAt(x,y-1,z).getType();
   		Material c=w.getBlockAt(x,y-2,z).getType();
   		if (isMushy(b,c)) p.setFallDistance(0);
-  		Location p1=e.getFrom();
-  		Location p2=e.getTo();
+  		else return;
+  		Location p1=e.getFrom(),p2=e.getTo();
   		int fy=(int)Math.round(p1.getY());
   		int ty=(int)Math.round(p2.getY());
-  		double xb=0;
-  		double zb=0;
-  		double pp=getNode("sidePoof")*1.0D;
-  		double pn=getNode("sidePoof")*-1.0D;
-  		switch (getDirection(p)) {
-  			case 360:xb=pp;break;
-  			case 180:xb=pn;break;
-  			case 270:zb=pp;break;
-  			case 90:zb=pn;break;
-  			case 315:xb=pp;zb=pp;break;
-  			case 45:xb=pp;zb=pn;break;
-  			case 225:xb=pn;zb=pp;break;
-  			case 135:xb=pn;zb=pn;break;
-  		}
-  		Vector v=p.getVelocity();
-  		double uppfart=v.getY();
-  		if ((ty-fy==1)&&isMushy(b,c)&&(uppfart>STILL)) {
-  			p.setVelocity(new Vector(xb,getNode("heightPoof")*1.0D,zb));
+  		Vector dir = p.getLocation().getDirection();
+  		double sp = getNode("sidePoof");
+  		double hp = getNode("heightPoof")*1.0D;
+  	    if (p.isSprinting() && config.getBoolean("fasterWhenSprinting")) {
+  	    	sp*=1.5;
+  	    	hp*=1.2;
+  	    }
+  	    dir=dir.multiply(sp);
+  	    dir.setY(hp);
+  		if (p.getVelocity().getY()>STILL) {
+  			p.setVelocity(dir);
   			loc.setX(x);
   		}
   		Material o=w.getBlockAt(x,y+3,z).getType();
@@ -138,18 +131,5 @@ public class MushPoof extends JavaPlugin implements Listener {
 			if (b.getType().equals(Material.GOLD_BOOTS)) return true;
 			return false;
 		}
-	}
-	
-	private int getDirection(Player p) {
-		float y=p.getLocation().getYaw();
-		if (y>=22.5D&&y<67.5D||y<=-292.5D&&y>-337.5D) return 225;
-	    if (y>=67.5D&&y<112.5D||y<=-247.5D&&y>-292.5D) return 180;
-	    if (y>=112.5D&&y<157.5D||y<=-202.5D&&y>-247.5D) return 135;
-	    if (y>=157.5D&&y<202.5D||y<=-157.5D&&y>-202.5D) return 90;
-	    if (y>=202.5D&&y<247.5D||y<=-112.5D&&y>-157.5D) return 45;
-	    if (y>=247.5D&&y<292.5D||y<=-67.5D&&y>-112.5D) return 360;
-	    if (y>=292.5D&&y<337.5D||y<=-22.5D&&y>-67.5D) return 315;
-	    if (y>=337.5D||y<22.5D||y<=-337.5D||y>-22.5D) return 270;
-	    return 0;
 	}
 }
