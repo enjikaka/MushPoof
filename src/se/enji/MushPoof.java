@@ -1,7 +1,5 @@
 package se.enji;
 
-import java.util.Random;
-
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -21,7 +19,6 @@ import org.bukkit.util.Vector;
 
 public class MushPoof extends JavaPlugin implements Listener {
 	FileConfiguration config;
-	Random random = new Random();
 	final double STILL = -0.0784000015258789;
 	boolean canJump = true;
 
