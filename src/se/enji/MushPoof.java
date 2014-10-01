@@ -28,7 +28,7 @@ public class MushPoof extends JavaPlugin implements Listener {
 		config.options().copyDefaults(true);
 		saveConfig();
 	}
-	
+
 	public boolean onCommand(CommandSender sender, Command cmd, String command, String[] args) {
 		if (!(sender instanceof Player)) return false;
 		Player p = (Player) sender;
@@ -36,7 +36,7 @@ public class MushPoof extends JavaPlugin implements Listener {
 		p.getInventory().addItem(new ItemStack(Material.HUGE_MUSHROOM_2, amount));
 		return true;
 	}
-	
+
 	@EventHandler
 	public void onEntityDamage(EntityDamageEvent e) {
 		if (!e.getEntityType().equals(EntityType.PLAYER)) return;
@@ -44,7 +44,7 @@ public class MushPoof extends JavaPlugin implements Listener {
 		if (config.getBoolean("goldenBoots") && !goldenBoots(p)) return;
 		if (e.getCause().equals(DamageCause.FALL) && goldenBoots(p)) e.setCancelled(true);
 	}
-	
+
 	@EventHandler
 	public void onPlayerMove(PlayerMoveEvent e) {
   		Player p = e.getPlayer();
@@ -81,21 +81,21 @@ public class MushPoof extends JavaPlugin implements Listener {
   	  		}
   		} else return;
 	}
-	
+
 	private boolean isMush(Material m) {
 		if (m.equals(Material.HUGE_MUSHROOM_1) || m.equals(Material.HUGE_MUSHROOM_2)) return true;
 		return false;
 	}
-	
+
 	private boolean isInt(String s) {
 		try {
-			Integer.parseInt(s); 
+			Integer.parseInt(s);
 		} catch (NumberFormatException e) {
-			return false; 
+			return false;
 		}
 	    return true;
 	}
-	
+
 	private boolean goldenBoots(Player p) {
 		return (p.getInventory().getBoots() == null) ? false : p.getInventory().getBoots().getType().equals(Material.GOLD_BOOTS);
 	}
