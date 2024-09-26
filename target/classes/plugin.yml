@@ -1,8 +1,8 @@
 name: MushPoof
-main: se.enji.MushPoof
+main: se.jeremy.MushPoof
 author: enjikaka
-website: http://enji.se
-version: 4.1.4
+website: https://jeremy.se
+version: 4.1.5
 
 commands:
   mush:
