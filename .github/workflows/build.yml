@@ -9,6 +9,7 @@ jobs:
     strategy:
       matrix:
         java: [ 21 ]
+        gradle: [ "8.10" ]
       fail-fast: true
     steps:
       - uses: actions/checkout@v4
@@ -17,9 +18,16 @@ jobs:
         with:
           java-version: ${{ matrix.java }}
           distribution: 'temurin'
-      - name: Setup Gradle 8.10
+      - name: Setup Gradle (${{ matrix.gradle }})
         uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-version: "8.10" # Quotes required to prevent YAML converting to number
-      - name: Build with Gradle 8.10
+          gradle-version: ${{ matrix.gradle }}
+      - name: Build
         run: gradle build
+      - name: Test
+        run: gradle test
+      - name: Build jars
+        run: gradle jar
+      - uses: actions/upload-artifact@v4
+        with:
+          path: build/libs/*.jar
