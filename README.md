@@ -11,6 +11,6 @@ There is a Golden-Boots mode. This is disabled by default but can be turned on i
 
 ## Plugin Repos
 
-- [MushPoof on BukkitDev](http://dev.bukkit.org/bukkit-plugins/mushpoof/)
+- [MushPoof on BukkitDev](https://dev.bukkit.org/projects/mushpoof)
 - [MushPoof on Spigot](https://www.spigotmc.org/resources/mushpoof.14679/)
 - [MushPoof on PaperMC/Hangar](https://hangar.papermc.io/enjikaka/MushPoof)
