@@ -3,6 +3,7 @@ main: se.jeremy.MushPoof
 author: enjikaka
 website: https://jeremy.se
 version: 4.1.5
+api-version: '1.13'
 
 commands:
   mush:
